@@ -14,7 +14,7 @@ import (
 	"testing"
 )
 
-func Test256C(t *testing.T) {
+func Test512C(t *testing.T) {
 	// Test as in C program.
 	var hashes = [][]byte{
 		{
@@ -118,6 +118,25 @@ func Test512(t *testing.T) {
 
 func Test384(t *testing.T) {
 	testVectors(t, New384, vectors384)
+}
+
+func TestTwoWrites(t *testing.T) {
+	b := make([]byte, 65)
+	for i := range b {
+		b[i] = byte(i)
+	}
+	h1 := New()
+	h1.Write(b[:1])
+	h1.Write(b[1:])
+	sum1 := h1.Sum(nil)
+
+	h2 := New()
+	h2.Write(b)
+	sum2 := h2.Sum(nil)
+
+	if !bytes.Equal(sum1, sum2) {
+		t.Errorf("Result of two writes differs from a single write with the same bytes")
+	}
 }
 
 var bench = New()
